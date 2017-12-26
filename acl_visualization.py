@@ -58,7 +58,7 @@ def make_acl_dict(config):
     return acl_dict
 
 
-def make_int_dict(config):
+def make_int_dict(config):                                  # Config as list
     int_dict = {}
     int_attr = []
     int_f = False
@@ -69,8 +69,8 @@ def make_int_dict(config):
             int_f = True
             continue
         elif config[i].startswith(" ") and int_f:
-            print(config[i])
-            input()
+            # print(config[i])
+            # input()
             int_attr.append(config[i].strip("\n"))
             if not config[i+1].startswith(" "):
                 int_f = False
@@ -93,6 +93,33 @@ def network_address(input_string):
             temp.append(str(int(ip_addr[oct]) & int(mask[oct])))   #network ip address as a list
         net_addr_1 = ".".join(temp)+" "+ip_addr_mask.group(2)
     return net_addr_1
+
+
+def l3_interfaces(int_dict):
+    # Input type dictionary of interfaces
+    _l3_int_dict = {}
+    for int in int_dict:
+        for attr in int_dict[int]:
+            if attr.startswith(" ip address"):
+                _l3_int_dict[int] = int_dict[int]
+                break
+    return _l3_int_dict
+
+def no_shut_l3_to_file(_l3_int_dict, filepath):
+    # f_5int = False
+    index = 1
+    with open(filepath, "w", newline="") as out:
+        out.write("interface range ")
+        for int in _l3_int_dict:
+            if " shutdown" in _l3_int_dict[int]:
+                continue
+            elif index % 5 != 0:
+                index += 1
+                out.write(int+" , ")
+            else:
+                index += 1
+                out.write(int+"\n")
+                out.write("interface range ")
 
 # def find_matching_network(list):
 
