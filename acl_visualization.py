@@ -6,6 +6,8 @@ def list_from_file(path):
     try:
         with open (path,'r') as f:
             output = f.readlines()
+            for row in output:
+                output[output.index(row)] = row.strip("\n")
         return output
     except (OSError, IOError) as e:
         print ("Check Filepath")
@@ -124,6 +126,42 @@ def no_shut_l3_to_file(_l3_int_dict, filepath):
 # def find_matching_network(list):
 
 
+# def make_SW_HostGroup_dict(vlan_list):
+#     ##############################################
+#     # Input list made from vlan/ip_addr cvs file #
+#     ##############################################
+#     group_dict = {}
+#     for row in vlan_list:
+#         group_dict[]
+
+
+def make_List_of_Vlan_Dict(list):
+    #################################################
+    # Input is csv file containing columns named: 'subnet', 'mask', 'vlan_id',
+    #                                             'vlan_description', 'gateway', 'location'
+    # Output is a list of dictionaries containing early mentioned vlan info
+    #################################################
+    List_of_Vlan_Dict = []
+    clmn_names = list[0].split(";")                 # key names for dictionaries
+    for row in list[1:]:
+        tmp_dict = {}
+        clmns = row.split(";")
+        for i in range(len(clmns)):
+            tmp_dict[clmn_names[i]] = clmns[i]
+        List_of_Vlan_Dict.append(tmp_dict)          # List filling
+    return List_of_Vlan_Dict
+
+def all_locations(list_of_dict):
+    #################################################
+    # Input is ONLY a list of dictionaries containing early mentioned vlan info
+    # Output is a set of locations
+    #################################################
+    loc_set = set()
+    for _vlan_ in list_of_dict:
+        loc_set.add(_vlan_["location"])
+    return loc_set
+
+
 
 
 #while True:
@@ -136,8 +174,8 @@ conf_abspath = workdir+conf_filename
 vlan_ip_abspath = "C:/PY/FA/vlans/fosagro_vlan_ip_1.csv"
 l1 = list_from_file(conf_abspath)                   #
 l2 = list_from_file(vlan_ip_abspath)                # network ip, vlan, description etc
-for row in l2:
-    l2[l2.index(row)] = row.strip("\n")
+# for row in l2:
+#     l2[l2.index(row)] = row.strip("\n")
 all_acl = make_acl_dict(l1)
 all_int = make_int_dict(l1)
 # print (all_acl)
@@ -159,25 +197,25 @@ for key in all_int:                                 # Network Address at the end
             # print (all_int[key])
             break
 IF_csv_d = {}
-for key in all_int:
-    IF_csv_d[key] = []
-    IF_csv_d[key].append(all_int[key][0])           # Add description row
-    IF_csv_d[key].append(all_int[key][1])           # Add IP address row
-    for row in l2:
-        CLMN = row.split(";")                       # Make columns from l2.row
-        # IF_csv_d[key].append(all_int[key][1])          # Add IP address row
-        #
-        # Adding information from l2.row if Network IP address matched
-        #
-        if all_int[key][len(all_int[key])-1] == (CLMN[0]+" "+CLMN[1]).strip(" "):
-            # print (CLMN)
-            IF_csv_d[key].append("Vlan "+CLMN[3].strip(" ")+" - "+CLMN[2].strip(" "))
-            int_ip = re.search(r'^ ip address (\d+\.\d+\.\d+\.\d+) .+',IF_csv_d[key][1]).group(1)
-            GW = CLMN[4].strip(" ")
-            if int_ip == GW:
-                IF_csv_d[key].append("This interface is GW")
-            else:
-                IF_csv_d[key].append("GW is "+GW)
-            IF_csv_d[key].append(CLMN[5].strip(" "))
-#    for key in IF_csv_d:
-#    break
+# for key in all_int:
+#     IF_csv_d[key] = []
+#     IF_csv_d[key].append(all_int[key][0])           # Add description row
+#     IF_csv_d[key].append(all_int[key][1])           # Add IP address row
+#     for row in l2:
+#         CLMN = row.split(";")                       # Make columns from l2.row
+#         # IF_csv_d[key].append(all_int[key][1])          # Add IP address row
+#         #
+#         # Adding information from l2.row if Network IP address matched
+#         #
+#         if all_int[key][len(all_int[key])-1] == (CLMN[0]+" "+CLMN[1]).strip(" "):
+#             # print (CLMN)
+#             IF_csv_d[key].append("Vlan "+CLMN[3].strip(" ")+" - "+CLMN[2].strip(" "))
+#             int_ip = re.search(r'^ ip address (\d+\.\d+\.\d+\.\d+) .+',IF_csv_d[key][1]).group(1)
+#             GW = CLMN[4].strip(" ")
+#             if int_ip == GW:
+#                 IF_csv_d[key].append("This interface is GW")
+#             else:
+#                 IF_csv_d[key].append("GW is "+GW)
+#             IF_csv_d[key].append(CLMN[5].strip(" "))
+# #    for key in IF_csv_d:
+# #    break
